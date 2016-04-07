@@ -18,7 +18,7 @@ mergeset <- function(setup = FALSE) {
     
     columheaders <- "./UCI HAR Dataset/features.txt"
     acts <- "./UCI HAR Dataset/activity_labels.txt"
-   # labelvector <- c("WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS", "SITTING", "STANDING", "LAYING")
+    # labelvector <- c("WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS", "SITTING", "STANDING", "LAYING")
     
     
     
@@ -38,7 +38,7 @@ mergeset <- function(setup = FALSE) {
     newacts <- rbind(testA, trainA)
     newset <- cbind(newset, newacts)
     # rename(newset, activity1 = V1)
-    
+    mutate(activities, activities = activities$V1 )
     print(activities)
     # head(newset)
     # str(newset)
