@@ -64,16 +64,16 @@ mergeset <- function(setup = FALSE) {
     colnames(newset) <- as.vector(features[,2])
     
     # subset colums for mean or std deviation
-    newset <- subset(newset, select = grep("*mean*|*std*", names(newset)))
+    meanstdset <- subset(newset, select = grep("*mean*|*std*", names(newset)))
     
     # merged the activities and bind to the dataset
     newactivities <- rbind(testA, trainA)
     newactivities <- rename (newactivities, activityid = V1)
     
-    newset <- cbind(newset, newactivities)
+    meanstdset <- cbind(meanstdset, newactivities)
     
     # add activity names to the data set 
-    newset <- merge(activities, newset)
+    meanstdset <- merge(activities, meanstdset, by="activityid",all.x=T)
     
     # remove the index column created during the merge
     # newset <- newset[-1]
@@ -81,7 +81,7 @@ mergeset <- function(setup = FALSE) {
     # bind subject test and train data together and then bind it to the dataset
     newsubs <- rbind(testS, trainS)
     newsubs <- rename (newsubs, subject = V1)
-    newset <- cbind(newsubs, newset)
+    meanstdset <- cbind(newsubs, meanstdset)
     
     ## Add tidy names to the subjects and activities column
     # colnames(newset)[1] <- "subject"
@@ -91,16 +91,16 @@ mergeset <- function(setup = FALSE) {
     
     # newset <- newset[,-2]
     
-    names(newset) <- gsub("-", "", names(newset), perl=TRUE)
-    names(newset) <- gsub("acc", "accelerometer", names(newset), perl=TRUE)
-    names(newset) <- gsub("std", "standarddeviation", names(newset), perl=TRUE)
-    names(newset) <- gsub("\\)", "", names(newset), perl=TRUE)
-    names(newset) <- gsub("\\(", "", names(newset), perl=TRUE)
-    names(newset) <- gsub("\\,", "", names(newset), perl=TRUE)
+    names(meanstdset) <- gsub("-", "", names(meanstdset), perl=TRUE)
+    names(meanstdset) <- gsub("acc", "accelerometer", names(meanstdset), perl=TRUE)
+    names(meanstdset) <- gsub("std", "standarddeviation", names(meanstdset), perl=TRUE)
+    names(meanstdset) <- gsub("\\)", "", names(meanstdset), perl=TRUE)
+    names(meanstdset) <- gsub("\\(", "", names(meanstdset), perl=TRUE)
+    names(meanstdset) <- gsub("\\,", "", names(meanstdset), perl=TRUE)
     
     # group the data by activities and subjects and summarize the resulting columns by the mean 
-    newset <- tbl_df(newset)
-    newset2 <- dplyr::group_by(newset, activity, subject )
+    meanstdset <- tbl_df(meanstdset)
+    newset2 <- dplyr::group_by(meanstdset, activity, subject )
     newset3 <- dplyr::summarise_each(newset2, funs(mean))
     
     #########################################################################################################
