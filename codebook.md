@@ -1,5 +1,7 @@
 The following colums are in the tidyoutput.txt file which are sumarized values / mean based on subject and activity for all the other variables listed below
 
+## Measures
+```
 "subject"                                           int                                 
 "activity"                                          factor w 6/ levels
 "tbodyaccelerometermeanx"                           num
@@ -88,3 +90,15 @@ The following colums are in the tidyoutput.txt file which are sumarized values /
 "anglexgravitymean"                                 num
 "angleygravitymean"                                 num
 "anglezgravitymean"                                 num
+```
+
+
+## Activities
+```
+WALKING 
+WALKING_UPSTAIRS 
+WALKING_DOWNSTAIRS 
+SITTING 
+STANDING
+LAYING
+```
