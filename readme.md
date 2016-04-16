@@ -4,6 +4,12 @@
 
 ## Instructions
 
+To clean and tidy the data run the following script.
+If it is the first time your are running the script, you can run setup() in run_analysis.R
+to clean you data, run mergeset()
+
+## Project
+
 The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set.
 
 ### Review criterialess 
