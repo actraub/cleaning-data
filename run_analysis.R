@@ -15,14 +15,14 @@
 # From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
 
-library(plyr)
+
 library(dplyr) # data mgt
 
 #########################################################################################################
 # Mergeset - function to clean data from the UCI HAR Dataset
 #########################################################################################################
 
-mergeset2 <- function(setup = FALSE) {
+mergeset <- function(setup = FALSE) {
     
     # run setup function
     if (setup == TRUE) setup()
@@ -76,24 +76,17 @@ mergeset2 <- function(setup = FALSE) {
     
     mean.std.df <- cbind(mean.std.df, new.activities)
     
-    # add activity names to the data set 
-    mean.std.df <- merge(activities, mean.std.df, by="activityid")
-    
-    # remove the index column created during the merge
-    # new.df <- new.df[-1]
     
     # bind subject test and train data together and then bind it to the dataset
     subjects.df <- rbind(testS, trainS)
     subjects.df <- rename (subjects.df, subject = V1)
     mean.std.df <- cbind(subjects.df, mean.std.df)
     
-    ## Add tidy names to the subjects and activities column
-    # colnames(newset)[1] <- "subject"
-    # colnames(newset)[3] <- "activity"    
-    # colnames(newset)[2] <- "activity_id"    
+    # add activity names to the data set 
+    mean.std.df <- merge(activities, mean.std.df, by="activityid")
     
-    
-    # new.set <- new.set[,-2]
+    # remove the index column created during the merge
+    # new.df <- new.df[-1]
     
     names(mean.std.df) <- gsub("-", "", names(mean.std.df), perl=TRUE)
     names(mean.std.df) <- gsub("acc", "accelerometer", names(mean.std.df), perl=TRUE)
@@ -101,7 +94,6 @@ mergeset2 <- function(setup = FALSE) {
     names(mean.std.df) <- gsub("\\)", "", names(mean.std.df), perl=TRUE)
     names(mean.std.df) <- gsub("\\(", "", names(mean.std.df), perl=TRUE)
     # names(mean.std.df) <- gsub("\\(\\)", "", names(mean.std.df), perl=TRUE)
-    
     names(mean.std.df) <- gsub("\\,", "", names(mean.std.df), perl=TRUE)
     
     # group the data by activities and subjects and summarize the resulting columns by the mean 
@@ -110,11 +102,6 @@ mergeset2 <- function(setup = FALSE) {
     summary.df <- summarize_each(grouped.df, funs(mean))
     summary <- summarize(grouped.df, mean = mean(fbodybodygyrojerkmagmeanfreq))
    
-    test.ddply <- ddply(mean.std.dt,.(group, activity, subject),summarise,mean=mean(fbodybodygyrojerkmagmeanfreq))
-    
-    ddply(dfx, .(group, sex), summarize,
-          mean = round(mean(age), 2),
-          sd = round(sd(age), 2))
     
     #########################################################################################################
     # output
