@@ -108,7 +108,7 @@ mergeset <- function(setup = FALSE) {
     #########################################################################################################
     
     # write the tidy data set to a file
-    write.table (summary.df, tidyoutput, na = "NA", col.names = TRUE)
+    write.table (summary.df, tidyoutput, na = "NA", col.names = TRUE, row.names = FALSE)
   
     }
 
