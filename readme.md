@@ -4,9 +4,9 @@
 
 ## Instructions
 
-To clean and tidy the data run the following script.
-If it is the first time your are running the script, you can run setup() in run_analysis.R
-to clean you data, run mergeset()
+To clean and tidy the data run the following script in  **run_analysis.R**
+If it is the first time your are running the script, you can run **setup()** to download and unzip the data.
+to clean you data, run **mergeset()**
 
 ## Project
 
