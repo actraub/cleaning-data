@@ -15,18 +15,21 @@
 # From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
 
-
+library(plyr)
 library(dplyr) # data mgt
 
 #########################################################################################################
 # Mergeset - function to clean data from the UCI HAR Dataset
 #########################################################################################################
 
-mergeset <- function(setup = FALSE) {
+mergeset2 <- function(setup = FALSE) {
     
     # run setup function
     if (setup == TRUE) setup()
     
+    # new.df <- data.frame()
+    # new.df <- tbl_df(new.df)
+
     # location of files in import
     trainset            <- "./UCI HAR Dataset/train/X_train.txt"
     trainlabel          <- "./UCI HAR Dataset/train/y_train.txt"
@@ -53,35 +56,36 @@ mergeset <- function(setup = FALSE) {
     
     features            <- read.table(columheaders, header = FALSE)
     activities          <- read.table(acts, header = FALSE)
-    activities          <- rename (activities, activity = V2, activityid = V1)
+    
+    #add the column names to activities
+    activities          <- dplyr::rename(activities, activity = V2, activityid = V1)
     
     # merge the train and test datasets
-    newset <- rbind(test, train)
+    new.df <- rbind(test, train)
     
     # add column names from features to the merged datasets
     features[,2] <- tolower(features[,2])
-    
-    colnames(newset) <- as.vector(features[,2])
+    colnames(new.df) <- as.vector(features[,2])
     
     # subset colums for mean or std deviation
-    meanstdset <- subset(newset, select = grep("*mean*|*std*", names(newset)))
+    mean.std.df <- subset(new.df, select = grep("*mean*|*std*", names(new.df)))
     
     # merged the activities and bind to the dataset
-    newactivities <- rbind(testA, trainA)
-    newactivities <- rename (newactivities, activityid = V1)
+    new.activities <- rbind(testA, trainA)
+    new.activities <- dplyr::rename(new.activities, activityid = V1)
     
-    meanstdset <- cbind(meanstdset, newactivities)
+    mean.std.df <- cbind(mean.std.df, new.activities)
     
     # add activity names to the data set 
-    meanstdset <- merge(activities, meanstdset, by="activityid",all.x=T)
+    mean.std.df <- merge(activities, mean.std.df, by="activityid")
     
     # remove the index column created during the merge
-    # newset <- newset[-1]
+    # new.df <- new.df[-1]
     
     # bind subject test and train data together and then bind it to the dataset
-    newsubs <- rbind(testS, trainS)
-    newsubs <- rename (newsubs, subject = V1)
-    meanstdset <- cbind(newsubs, meanstdset)
+    subjects.df <- rbind(testS, trainS)
+    subjects.df <- rename (subjects.df, subject = V1)
+    mean.std.df <- cbind(subjects.df, mean.std.df)
     
     ## Add tidy names to the subjects and activities column
     # colnames(newset)[1] <- "subject"
@@ -89,26 +93,35 @@ mergeset <- function(setup = FALSE) {
     # colnames(newset)[2] <- "activity_id"    
     
     
-    # newset <- newset[,-2]
+    # new.set <- new.set[,-2]
     
-    names(meanstdset) <- gsub("-", "", names(meanstdset), perl=TRUE)
-    names(meanstdset) <- gsub("acc", "accelerometer", names(meanstdset), perl=TRUE)
-    names(meanstdset) <- gsub("std", "standarddeviation", names(meanstdset), perl=TRUE)
-    names(meanstdset) <- gsub("\\)", "", names(meanstdset), perl=TRUE)
-    names(meanstdset) <- gsub("\\(", "", names(meanstdset), perl=TRUE)
-    names(meanstdset) <- gsub("\\,", "", names(meanstdset), perl=TRUE)
+    names(mean.std.df) <- gsub("-", "", names(mean.std.df), perl=TRUE)
+    names(mean.std.df) <- gsub("acc", "accelerometer", names(mean.std.df), perl=TRUE)
+    names(mean.std.df) <- gsub("std", "standarddeviation", names(mean.std.df), perl=TRUE)
+    names(mean.std.df) <- gsub("\\)", "", names(mean.std.df), perl=TRUE)
+    names(mean.std.df) <- gsub("\\(", "", names(mean.std.df), perl=TRUE)
+    # names(mean.std.df) <- gsub("\\(\\)", "", names(mean.std.df), perl=TRUE)
+    
+    names(mean.std.df) <- gsub("\\,", "", names(mean.std.df), perl=TRUE)
     
     # group the data by activities and subjects and summarize the resulting columns by the mean 
-    meanstdset <- tbl_df(meanstdset)
-    newset2 <- dplyr::group_by(meanstdset, activity, subject )
-    newset3 <- dplyr::summarise_each(newset2, funs(mean))
+    mean.std.dt <- tbl_df(mean.std.df)
+    grouped.df <- group_by(mean.std.dt, activity, subject)
+    summary.df <- summarize_each(grouped.df, funs(mean))
+    summary <- summarize(grouped.df, mean = mean(fbodybodygyrojerkmagmeanfreq))
+   
+    test.ddply <- ddply(mean.std.dt,.(group, activity, subject),summarise,mean=mean(fbodybodygyrojerkmagmeanfreq))
+    
+    ddply(dfx, .(group, sex), summarize,
+          mean = round(mean(age), 2),
+          sd = round(sd(age), 2))
     
     #########################################################################################################
     # output
     #########################################################################################################
     
     # write the tidy data set to a file
-    write.table (newset3, tidyoutput, na = "NA", col.names = TRUE)
+    write.table (summary.df, tidyoutput, na = "NA", col.names = TRUE)
   
     }
 
@@ -135,7 +148,5 @@ setup <- function () {
         # unzip files to data directoru
         unzip(datasetzip)
     }
-    
-
 }
 
